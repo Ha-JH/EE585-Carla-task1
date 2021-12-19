@@ -276,12 +276,13 @@ class MyLocalPlanner(object):
 
     def check_front_obstacle(self):
         buffer = []
-        for i in range(3):
+        collision = False
+        for i in range(5):
             buffer.append(self._waypoint_buffer.popleft())
         target_point = buffer[-1]
         target_waypoint = self.get_waypoint(target_point.position)
-        collision = self.check_waypoint_obstacles(target_waypoint.pose.position)
-        for i in range(3):
+        collision = collision or self.check_waypoint_obstacles(target_waypoint.pose.position)
+        for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
 
         return collision
