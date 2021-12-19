@@ -77,7 +77,7 @@ class MyLocalPlanner(object):
         self._current_speed = None
         self._current_pose = None
         self._obstacles = []
-        self._changing_lane = False
+        self._changing_lane_buffer = [False] * 5
         self._lane_delta = 0
         self._lane_change_history = []
 
@@ -322,7 +322,7 @@ class MyLocalPlanner(object):
         waypoint = self.get_waypoint(midpoint.position)
         self._waypoint_buffer.appendleft(waypoint.pose)
 
-        self._changing_lane = True
+        self._changing_lane_buffer[0] = True
         self._lane_delta += 1
         self._lane_change_history.append(1)
 
@@ -345,31 +345,80 @@ class MyLocalPlanner(object):
         waypoint = self.get_waypoint(midpoint.position)
         self._waypoint_buffer.appendleft(waypoint.pose)
 
-        self._changing_lane = True
+        self._changing_lane_buffer[0] = True
         self._lane_delta -= 1
         self._lane_change_history.append(-1)
 
          
-    def check_passed(self):
+    def can_return(self):
+        buffer = []
+        for i in range(3):
+            buffer.append(self._waypoint_buffer.popleft())
+        target_point = buffer[-1]
+        target_waypoint = self.get_waypoint(target_point.position)
         last_lane_change = self._lane_change_history[-1]
-        left, right = self.get_coordinate_lanemarking(self._current_waypoint.pose.position)
+        left, right = self.get_coordinate_lanemarking(target_waypoint.pose.position)
         if last_lane_change == -1:
             left_waypoint = self.get_waypoint(left)
             passed = not self.check_waypoint_obstacles(left_waypoint.pose.position) 
         else:
             right_waypoint = self.get_waypoint(right)
             passed = not self.check_waypoint_obstacles(right_waypoint.pose.position)
-        result = self.check_adjacent_lanes()
-        return passed and not result[(last_lane_change+1)/2]
+        for i in range(3):
+            self._waypoint_buffer.appendleft(buffer.pop())
+        return passed
 
     def return_lane(self):
         last_lane_change = self._lane_change_history[-1]
         if last_lane_change == -1:
-            self.change_lane_left()
-        else:
-            self.change_lane_right()
+            buffer = []
+            target_buffer = []
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+            waypoint5 = self.get_waypoint(point.position)
+            left, right = self.get_coordinate_lanemarking(waypoint5.pose.position)
+            left_waypoint = self.get_waypoint(left)
+            target_buffer.append(left_waypoint.pose)
 
-        self._lane_change_history.pop()
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+            waypoint3 = self.get_waypoint(point.position)
+
+            midpoint = self.get_mid_waypoint(waypoint3.pose, waypoint5.pose)
+            waypoint4 = self.get_waypoint(midpoint.position)
+            target_buffer.append(waypoint4)
+            target_buffer.append(waypoint3)
+            self._lane_delta += 1
+            self._lane_change_history.append(1)
+
+        else:
+            buffer = []
+            target_buffer = []
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+            waypoint5 = self.get_waypoint(point.position)
+            left, right = self.get_coordinate_lanemarking(waypoint5.pose.position)
+            right_waypoint = self.get_waypoint(right)
+            target_buffer.append(right_waypoint.pose)
+
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+
+            point = self._waypoint_buffer.pop()
+            buffer.append(point)
+            waypoint3 = self.get_waypoint(point.position)
+
+            midpoint = self.get_mid_waypoint(waypoint3.pose, waypoint5.pose)
+            waypoint4 = self.get_waypoint(midpoint.position)
+            target_buffer.append(waypoint4)
+            target_buffer.append(waypoint3)
+            self._lane_delta -= 1
+            self._lane_change_history.append(-1)
+
+        self._changing_lane_buffer[3] = True
         self._lane_change_history.pop()
         
 
@@ -447,10 +496,11 @@ class MyLocalPlanner(object):
         # for ob in self._obstacles:
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
-        # target waypoint
         
+
+        # target waypoint
         if len(self._waypoint_buffer) >= 5:
-            if self._changing_lane:
+            if self._changing_lane_buffer[0]:
                 self.changing_lane()
                 print("CHANGING LANE")
             else:
@@ -472,7 +522,7 @@ class MyLocalPlanner(object):
                     else:
                         print("NO WHERE TO GO!")
 
-
+        self._changing_lane_buffer = self._changing_lane_buffer[1:] + [False]
 
 
             # target_route_point = self._waypoint_buffer.popleft()
