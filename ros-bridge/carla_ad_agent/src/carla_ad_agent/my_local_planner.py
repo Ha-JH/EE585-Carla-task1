@@ -297,6 +297,11 @@ class MyLocalPlanner(object):
             left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
             left_waypoint = self.get_waypoint(left)
             right_waypoint = self.get_waypoint(right)
+
+            print("currernt lane: ", self._current_waypoint.lane_id)
+            print("left lane: ", left_waypoint.lane_id)
+            print("right lane: ", right_waypoint.lane_id)
+
             result[0] = result[0] or self.check_waypoint_obstacles(left_waypoint.pose.position)
             result[1] = result[1] or self.check_waypoint_obstacles(right_waypoint.pose.position)
             print(result)
