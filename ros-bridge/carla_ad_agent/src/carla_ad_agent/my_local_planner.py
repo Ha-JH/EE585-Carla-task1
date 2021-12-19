@@ -492,7 +492,7 @@ class MyLocalPlanner(object):
             else:
                 self.keep_straight()
                 if self._passing:
-                    self.side()
+                    self.check_side()
 
                 if self._lane_delta != 0 and not self._passing:
                     if self.can_return():
