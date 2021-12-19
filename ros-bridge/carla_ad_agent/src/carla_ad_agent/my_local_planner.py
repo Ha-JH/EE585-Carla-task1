@@ -262,6 +262,14 @@ class MyLocalPlanner(object):
         for elem in current_plan:
             self._waypoints_queue.append(elem.pose)
 
+    def get_mid_waypoint(self, pose1, pose2):
+        midpoint = Pose()
+        midpoint.position.x = (pose1.x + pose2.x) / 2.0
+        midpoint.position.y = (pose1.y + pose2.y) / 2.0
+        midpoint.position.z = (pose1.z + pose2.z) / 2.0
+
+        return midpoint
+
     def run_step(self, target_speed, current_speed, current_pose):
         """
         Execute one step of local planning which involves running the longitudinal
@@ -310,31 +318,46 @@ class MyLocalPlanner(object):
         # target waypoint
         target_route_point = self._waypoint_buffer[0]
         target_waypoint = self.get_waypoint(target_route_point.position)
-        print("Distance to next waypoint:  ", math.sqrt((target_route_point.position.x-current_pose.position.x)**2 + (target_route_point.position.y-current_pose.position.y)**2 + (target_route_point.position.z-current_pose.position.z)**2))
-        
-        target_left, target_right = self.get_coordinate_lanemarking(target_waypoint.pose.position)
-        target_left_waypoint = self.get_waypoint(target_left)
-        target_right_waypoint = self.get_waypoint(target_right)
+        future_route_point = self._waypoint_buffer[1]
+        future_waypoint = self.get_waypoint(future_route_point.position)
 
-        if self._current_waypoint.lane_id == target_waypoint.lane_id:
-            if self.check_waypoint_obstacles(target_waypoint.pose.position):
-                if not self.check_waypoint_obstacles(target_left_waypoint.pose.position):
-                    self._waypoint_buffer[0] = target_left_waypoint.pose
-                elif not self.check_waypoint_obstacles(target_right_waypoint.pose.position):
-                    self._waypoint_buffer[0] = target_right_waypoint.pose
+        # print("Distance to next waypoint:  ", math.sqrt((target_route_point.position.x-current_pose.position.x)**2 + (target_route_point.position.y-current_pose.position.y)**2 + (target_route_point.position.z-current_pose.position.z)**2))
+        
+        future_left, future_right = self.get_coordinate_lanemarking(future_waypoint.pose.position)
+        future_left_waypoint = self.get_waypoint(future_left)
+        future_right_waypoint = self.get_waypoint(future_right)
+
+        if self._current_waypoint.lane_id == future_waypoint.lane_id:
+            if self.check_waypoint_obstacles(future_waypoint.pose.position):
+                if not self.check_waypoint_obstacles(future_left_waypoint.pose.position):
+                    self._waypoint_buffer[1] = future_left_waypoint.pose
+                    target_route_point = self.get_mid_waypoint(current_pose, future_left_waypoint.pose)
+                    target_waypoint = self.get_waypoint(target_route_point.position)
+                    self._waypoint_buffer[0] = target_waypoint.pose
+                elif not self.check_waypoint_obstacles(future_right_waypoint.pose.position):
+                    self._waypoint_buffer[1] = future_right_waypoint.pose
+                    target_route_point = self.get_mid_waypoint(current_pose, future_right_waypoint.pose)
+                    target_waypoint = self.get_waypoint(target_route_point.position)
+                    self._waypoint_buffer[0] = target_waypoint.pose
                 else:
                     print("FUCK! NOWHERE TO GO!!!!")
         
         else:
-            if self.check_waypoint_obstacles(target_waypoint.pose.position):
-                if self._current_waypoint.lane_id == target_left_waypoint.lane_id:
-                    if not self.check_waypoint_obstacles(target_left_waypoint.pose.position):
-                        self._waypoint_buffer[0] = target_left_waypoint.pose
+            if self.check_waypoint_obstacles(future_waypoint.pose.position):
+                if self._current_waypoint.lane_id == future_left_waypoint.lane_id:
+                    if not self.check_waypoint_obstacles(future_left_waypoint.pose.position):
+                        self._waypoint_buffer[1] = future_left_waypoint.pose
+                        target_route_point = self.get_mid_waypoint(current_pose, future_left_waypoint.pose)
+                        target_waypoint = self.get_waypoint(target_route_point.position)
+                        self._waypoint_buffer[0] = target_waypoint.pose
                     else:
                         print("FUCK! NOWHERE TO GO!!!!")
-                elif self._current_waypoint.lane_id == target_right_waypoint.lane_id:
-                    if not self.check_waypoint_obstacles(target_right_waypoint.pose.position):
-                        self._waypoint_buffer[0] = target_right_waypoint.pose
+                elif self._current_waypoint.lane_id == future_right_waypoint.lane_id:
+                    if not self.check_waypoint_obstacles(future_right_waypoint.pose.position):
+                        self._waypoint_buffer[1] = future_right_waypoint.pose
+                        target_route_point = self.get_mid_waypoint(current_pose, future_right_waypoint.pose)
+                        target_waypoint = self.get_waypoint(target_route_point.position)
+                        self._waypoint_buffer[0] = target_waypoint.pose
                     else:
                         print("FUCK! NOWHERE TO GO!!!!")
                 else:
