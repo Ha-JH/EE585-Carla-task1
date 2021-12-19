@@ -316,26 +316,34 @@ class MyLocalPlanner(object):
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
         # target waypoint
-        if len(self._waypoint_buffer) > 1:
+        print(len(self._waypoint_buffer))
+        if len(self._waypoint_buffer) >= 3:
             target_route_point = self._waypoint_buffer.popleft()
             target_waypoint = self.get_waypoint(target_route_point.position)
             future_route_point = self._waypoint_buffer.popleft()
             future_waypoint = self.get_waypoint(future_route_point.position)
+            far_route_point = self._waypoint_buffer.popleft()
+            far_waypoint = self.get_waypoint(far_route_point.position)
 
             # print("Distance to next waypoint:  ", math.sqrt((target_route_point.position.x-current_pose.position.x)**2 + (target_route_point.position.y-current_pose.position.y)**2 + (target_route_point.position.z-current_pose.position.z)**2))
             
+            far_left, far_right = self.get_coordinate_lanemarking(far_waypoint.pose.position)
+            far_left_waypoint = self.get_waypoint(far_left)
+            far_right_waypoint = self.get_waypoint(far_right)
             future_left, future_right = self.get_coordinate_lanemarking(future_waypoint.pose.position)
             future_left_waypoint = self.get_waypoint(future_left)
             future_right_waypoint = self.get_waypoint(future_right)
 
-            if self._current_waypoint.lane_id == future_waypoint.lane_id:
+            if self._current_waypoint.lane_id == far_waypoint.lane_id:
                 if self.check_waypoint_obstacles(future_waypoint.pose.position):
-                    if not self.check_waypoint_obstacles(future_left_waypoint.pose.position):
+                    if not self.check_waypoint_obstacles(far_left_waypoint.pose.position):
+                        self._waypoint_buffer.appendleft(far_left_waypoint.pose)
                         self._waypoint_buffer.appendleft(future_left_waypoint.pose)
                         target_route_point = self.get_mid_waypoint(current_pose, future_left_waypoint.pose)
                         target_waypoint = self.get_waypoint(target_route_point.position)
                         self._waypoint_buffer.appendleft(target_waypoint.pose)
                     elif not self.check_waypoint_obstacles(future_right_waypoint.pose.position):
+                        self._waypoint_buffer.appendleft(far_right_waypoint.pose)
                         self._waypoint_buffer.appendleft(future_right_waypoint.pose)
                         target_route_point = self.get_mid_waypoint(current_pose, future_right_waypoint.pose)
                         target_waypoint = self.get_waypoint(target_route_point.position)
@@ -347,6 +355,7 @@ class MyLocalPlanner(object):
                 if self.check_waypoint_obstacles(future_waypoint.pose.position):
                     if self._current_waypoint.lane_id == future_left_waypoint.lane_id:
                         if not self.check_waypoint_obstacles(future_left_waypoint.pose.position):
+                            self._waypoint_buffer.appendleft(far_left_waypoint.pose)
                             self._waypoint_buffer.appendleft(future_left_waypoint.pose)
                             target_route_point = self.get_mid_waypoint(current_pose, future_left_waypoint.pose)
                             target_waypoint = self.get_waypoint(target_route_point.position)
@@ -355,6 +364,7 @@ class MyLocalPlanner(object):
                             print("FUCK! NOWHERE TO GO!!!!")
                     elif self._current_waypoint.lane_id == future_right_waypoint.lane_id:
                         if not self.check_waypoint_obstacles(future_right_waypoint.pose.position):
+                            self._waypoint_buffer.appendleft(far_right_waypoint.pose)
                             self._waypoint_buffer.appendleft(future_right_waypoint.pose)
                             target_route_point = self.get_mid_waypoint(current_pose, future_right_waypoint.pose)
                             target_waypoint = self.get_waypoint(target_route_point.position)
