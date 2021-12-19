@@ -503,7 +503,7 @@ class MyLocalPlanner(object):
                 print("CHANGING LANE")
             else:
                 self.keep_straight()
-                if self._lane_delta > 0:
+                if self._lane_delta != 0:
                     if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
