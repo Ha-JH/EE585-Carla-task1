@@ -202,6 +202,26 @@ class MyLocalPlanner(object):
         ros_right_waypoint.y = right_waypoint[1]
         return ros_left_waypoint, ros_right_waypoint
 
+    def get_adjacent_lane_points(self, position):
+        left_lane, right_lane = self.get_coordinate_lanemarking(position)
+        left_dx = left_lane.x - position.x
+        left_dy = left_lane.y - position.y
+        left_point = Point()
+        left_point.x = position.x + 1.5 * left_dx
+        left_point.y = position.y + 1.5 * left_dy
+        left_left, left_right = self.get_coordinate_lanemarking(left_point)
+        left_midpoint = self.get_mid_waypoint(left_left, left_right)
+
+        right_dx = right_lane.x - position.x
+        right_dy = right_lane.y - position.y
+        right_point = Point()
+        right_point.x = position.x + 1.5 * right_dx
+        right_point.y = position.y + 1.5 * right_dy
+        right_left, right_right = self.get_coordinate_lanemarking(right_point)
+        right_midpoint = self.get_mid_waypoint(right_left, right_right)
+
+        return left_midpoint, right_midpoint
+
     def get_waypoint(self, location):
         """
         Helper to get waypoint from a ros service
@@ -267,11 +287,11 @@ class MyLocalPlanner(object):
         for elem in current_plan:
             self._waypoints_queue.append(elem.pose)
 
-    def get_mid_waypoint(self, pose1, pose2):
-        midpoint = Pose()
-        midpoint.position.x = (pose1.position.x + pose2.position.x) / 2.0
-        midpoint.position.y = (pose1.position.y + pose2.position.y) / 2.0
-        midpoint.position.z = (pose1.position.z + pose2.position.z) / 2.0
+    def get_mid_waypoint(self, point1, point2):
+        midpoint = Point()
+        midpoint.x = (point1.x + point2.x) / 2.0
+        midpoint.y = (point1.y + point2.y) / 2.0
+        midpoint.z = (point1.z + point2.z) / 2.0
 
         return midpoint
 
@@ -292,12 +312,12 @@ class MyLocalPlanner(object):
         buffer = []
         result = [False, False]
         for i in range(5):
-            point = self._waypoint_buffer.popleft()
-            buffer.append(point)
-            waypoint = self.get_waypoint(point.position)
-            left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-            left_waypoint = self.get_waypoint(left)
-            right_waypoint = self.get_waypoint(right)
+            pose = self._waypoint_buffer.popleft()
+            buffer.append(pose)
+            waypoint = self.get_waypoint(pose.position)
+            left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
+            left_waypoint = self.get_waypoint(left_point)
+            right_waypoint = self.get_waypoint(right_point)
 
             print("currernt lane: ", waypoint.pose.position)
             print("left lane: ", left_waypoint.pose.position)
@@ -315,18 +335,18 @@ class MyLocalPlanner(object):
         buffer = []
         target_buffer = []
         for i in range(5):
-            point = self._waypoint_buffer.popleft()
-            buffer.append(point)
+            pose = self._waypoint_buffer.popleft()
+            buffer.append(pose)
             if i > 0:
-                waypoint = self.get_waypoint(point.position)
-                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-                left_waypoint = self.get_waypoint(left)
+                waypoint = self.get_waypoint(pose.position)
+                left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
+                left_waypoint = self.get_waypoint(left_point)
                 target_buffer.append(left_waypoint.pose)
         for i in range(4):
             self._waypoint_buffer.appendleft(target_buffer.pop())
 
-        midpoint = self.get_mid_waypoint(self._current_waypoint.pose, self._waypoint_buffer[0])
-        waypoint = self.get_waypoint(midpoint.position)
+        midpoint = self.get_mid_waypoint(self._current_waypoint.pose.position, self._waypoint_buffer[0].position)
+        waypoint = self.get_waypoint(midpoint)
         self._waypoint_buffer.appendleft(waypoint.pose)
 
         self._changing_lane = True
@@ -338,18 +358,18 @@ class MyLocalPlanner(object):
         buffer = []
         target_buffer = []
         for i in range(5):
-            point = self._waypoint_buffer.popleft()
-            buffer.append(point)
+            pose = self._waypoint_buffer.popleft()
+            buffer.append(pose)
             if i > 0:
-                waypoint = self.get_waypoint(point.position)
-                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-                right_waypoint = self.get_waypoint(right)
+                waypoint = self.get_waypoint(pose.position)
+                left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
+                right_waypoint = self.get_waypoint(right_point)
                 target_buffer.append(right_waypoint.pose)
         for i in range(4):
             self._waypoint_buffer.appendleft(target_buffer.pop())
 
-        midpoint = self.get_mid_waypoint(self._current_waypoint.pose, self._waypoint_buffer[0])
-        waypoint = self.get_waypoint(midpoint.position)
+        midpoint = self.get_mid_waypoint(self._current_waypoint.pose.position, self._waypoint_buffer[0].position)
+        waypoint = self.get_waypoint(midpoint)
         self._waypoint_buffer.appendleft(waypoint.pose)
 
         self._changing_lane = True
@@ -359,12 +379,12 @@ class MyLocalPlanner(object):
          
     def can_return(self):
         last_lane_change = self._lane_change_history[-1]
-        left, right = self.get_coordinate_lanemarking(self._current_waypoint.pose.position)
+        left_point, right_point = self.get_adjacent_lane_points(self._current_waypoint.pose.position)
         if last_lane_change == -1:
-            left_waypoint = self.get_waypoint(left)
+            left_waypoint = self.get_waypoint(left_point)
             passed = not self.check_waypoint_obstacles(left_waypoint.pose.position) 
         else:
-            right_waypoint = self.get_waypoint(right)
+            right_waypoint = self.get_waypoint(right_point)
             passed = not self.check_waypoint_obstacles(right_waypoint.pose.position)
         result = self.check_adjacent_lanes_obstacles()
         return passed and not result[(last_lane_change+1)/2]
@@ -383,17 +403,17 @@ class MyLocalPlanner(object):
     def keep_straight(self):
         if self._lane_delta == 0:
             return
-        point = self._waypoint_buffer.pop()
-        waypoint = self.get_waypoint(point.position)
+        pose = self._waypoint_buffer.pop()
+        waypoint = self.get_waypoint(pose.position)
         if self._lane_delta > 0:
             for i in range(abs(self._lane_delta)):
-                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-                left_waypoint = self.get_waypoint(left)
+                left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
+                left_waypoint = self.get_waypoint(left_point)
                 waypoint = left_waypoint
         else:
             for i in range(abs(self._lane_delta)):
-                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-                right_waypoint = self.get_waypoint(right)
+                left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
+                right_waypoint = self.get_waypoint(right_point)
                 waypoint = right_waypoint
         self._waypoint_buffer.append(waypoint.pose)
         
