@@ -287,8 +287,8 @@ class MyLocalPlanner(object):
             return control, True
 
         #   Buffering the waypoints
-        if not self._waypoint_buffer:
-            for i in range(self._buffer_size):
+        if len(self._waypoint_buffer) < 3:
+            for i in range(self._buffer_size - len(self._waypoint_buffer)):
                 if self._waypoints_queue:
                     self._waypoint_buffer.append(
                         self._waypoints_queue.popleft())
