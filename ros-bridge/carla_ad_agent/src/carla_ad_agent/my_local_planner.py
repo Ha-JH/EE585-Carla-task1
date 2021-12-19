@@ -392,7 +392,6 @@ class MyLocalPlanner(object):
             target_buffer.append(waypoint4)
             target_buffer.append(waypoint3)
             self._lane_delta += 1
-            self._lane_change_history.append(1)
 
         else:
             buffer = []
@@ -416,7 +415,6 @@ class MyLocalPlanner(object):
             target_buffer.append(waypoint4)
             target_buffer.append(waypoint3)
             self._lane_delta -= 1
-            self._lane_change_history.append(-1)
 
         self._changing_lane_buffer[3] = True
         self._lane_change_history.pop()
@@ -509,6 +507,8 @@ class MyLocalPlanner(object):
                     if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
+                    else:
+                        print("CANNOT RETURN")
 
                 if not sum(self._changing_lane_buffer) and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
