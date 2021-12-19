@@ -350,7 +350,7 @@ class MyLocalPlanner(object):
         self._lane_change_history.append(-1)
 
          
-    def check_passed(self):
+    def can_return(self):
         last_lane_change = self._lane_change_history[-1]
         left, right = self.get_coordinate_lanemarking(self._current_waypoint.pose.position)
         if last_lane_change == -1:
@@ -360,6 +360,7 @@ class MyLocalPlanner(object):
             right_waypoint = self.get_waypoint(right)
             passed = not self.check_waypoint_obstacles(right_waypoint.pose.position)
         result = self.check_adjacent_lanes_obstacles()
+        print(result)
         return passed and not result[(last_lane_change+1)/2]
 
     def return_lane(self):
@@ -456,7 +457,7 @@ class MyLocalPlanner(object):
             else:
                 self.keep_straight()
                 if self._lane_delta != 0:
-                    if self.check_passed():
+                    if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
 
