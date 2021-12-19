@@ -506,7 +506,7 @@ class MyLocalPlanner(object):
             else:
                 self.keep_straight()
                 if self._lane_delta > 0:
-                    if self.check_passed():
+                    if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
 
