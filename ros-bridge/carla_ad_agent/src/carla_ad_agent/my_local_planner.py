@@ -309,10 +309,11 @@ class MyLocalPlanner(object):
         for i in range(5):
             point = self._waypoint_buffer.popleft()
             buffer.append(point)
-            waypoint = self.get_waypoint(point.position)
-            left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-            left_waypoint = self.get_waypoint(left)
-            target_buffer.append(left_waypoint.pose)
+            if i > 0:
+                waypoint = self.get_waypoint(point.position)
+                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
+                left_waypoint = self.get_waypoint(left)
+                target_buffer.append(left_waypoint.pose)
         for i in range(4):
             self._waypoint_buffer.appendleft(target_buffer.pop())
 
@@ -322,7 +323,7 @@ class MyLocalPlanner(object):
 
         self._changing_lane = True
         self._lane_delta += 1
-        self._lane_change_history.append(-1)
+        self._lane_change_history.append(1)
 
 
     def change_lane_right(self):
@@ -331,10 +332,11 @@ class MyLocalPlanner(object):
         for i in range(5):
             point = self._waypoint_buffer.popleft()
             buffer.append(point)
-            waypoint = self.get_waypoint(point.position)
-            left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
-            right_waypoint = self.get_waypoint(right)
-            target_buffer.append(right_waypoint.pose)
+            if i > 0:
+                waypoint = self.get_waypoint(point.position)
+                left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
+                right_waypoint = self.get_waypoint(right)
+                target_buffer.append(right_waypoint.pose)
         for i in range(4):
             self._waypoint_buffer.appendleft(target_buffer.pop())
 
@@ -453,13 +455,16 @@ class MyLocalPlanner(object):
                 self.keep_straight()
                 if self.check_front_obstacle():
                     result = self.check_adjacent_lanes_obstacles()
-                    if result[0]:
+                    if not result[0]:
+                        self.change_lane_left()
+                    elif not result[0]:
                         self.change_lane_right()
                     else:
-                        self.change_lane_left()
+                        print("NO WHERE TO GO!")
                 else:
-                    if self.check_passed():
-                        self.return_lane()
+                    if self._lane_delta > 0:
+                        if self.check_passed():
+                            self.return_lane()
 
 
 
