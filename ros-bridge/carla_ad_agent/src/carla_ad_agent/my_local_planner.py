@@ -510,7 +510,7 @@ class MyLocalPlanner(object):
                         self.return_lane()
                         print("RETURNING LANE")
 
-                if not self._changing_lane and self.check_front_obstacle():
+                if not sum(self._changing_lane_buffer) and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
