@@ -154,6 +154,12 @@ class MyLocalPlanner(object):
                 and carla_location.y >= min(vy) and carla_location.y <= max(vy) \
                 and carla_location.z >= min(vz) and carla_location.z <= max(vz) 
 
+    def check_obstacle(self, position, obstacles):
+        for obstacle in obstacles:
+            if self.check_obstacle(position, obstacle):
+                return True
+        return False 
+
     def get_coordinate_lanemarking(self, position):
         """
         Helper to get adjacent waypoint 2D coordinates of the left and right lane markings 
@@ -283,10 +289,10 @@ class MyLocalPlanner(object):
         # get a list of obstacles surrounding the ego vehicle
         self.get_obstacles(current_pose.position, 70.0)
 
-        # # Example 1: get two waypoints on the left and right lane marking w.r.t current pose
-        # left, right = self.get_coordinate_lanemarking(current_pose.position)
-        # print("\x1b[6;30;33m------Example 1------\x1b[0m")
-        # print("Left: {}, {}; right: {}, {}".format(left.x, left.y, right.x, right.y))
+        # Example 1: get two waypoints on the left and right lane marking w.r.t current pose
+        left, right = self.get_coordinate_lanemarking(current_pose.position)
+        print("\x1b[6;30;33m------Example 1------\x1b[0m")
+        print("Left: {}, {}; right: {}, {}".format(left.x, left.y, right.x, right.y))
         
         # # Example 2: check obstacle collision
         # print("\x1b[6;30;33m------Example 2------\x1b[0m")
