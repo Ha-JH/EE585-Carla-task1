@@ -299,10 +299,9 @@ class MyLocalPlanner(object):
             right_waypoint = self.get_waypoint(right)
             result[0] = result[0] or self.check_waypoint_obstacles(left_waypoint.pose.position)
             result[1] = result[1] or self.check_waypoint_obstacles(right_waypoint.pose.position)
+            print(result)
         for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
-
-        print(result)
         
         return result
 
@@ -444,7 +443,6 @@ class MyLocalPlanner(object):
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
         # target waypoint
-        print(self._lane_delta)
         if len(self._waypoint_buffer) >= 5:
             if self._changing_lane:
                 self.changing_lane()
