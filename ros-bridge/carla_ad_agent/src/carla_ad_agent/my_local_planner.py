@@ -378,12 +378,7 @@ class MyLocalPlanner(object):
     def keep_straight(self):
         if self._lane_delta == 0:
             return
-        buffer = []
-        for i in range(4):
-            point = self._waypoint_buffer.popleft()
-            buffer.append(point)
-
-        point = self._waypoint_buffer.popleft()
+        point = self._waypoint_buffer.pop()
         waypoint = self.get_waypoint(point.position)
         if self._lane_delta > 0:
             for i in range(abs(self._lane_delta)):
@@ -395,9 +390,8 @@ class MyLocalPlanner(object):
                 left, right = self.get_coordinate_lanemarking(waypoint.pose.position)
                 right_waypoint = self.get_waypoint(right)
                 waypoint = right_waypoint
-        self._waypoint_buffer.appendleft(waypoint.pose)
-        for i in range(4):
-            self._waypoint_buffer.appendleft(buffer.pop())
+        self._waypoint_buffer.append(waypoint.pose)
+        
 
     def changing_lane(self):
         self.keep_straight()
@@ -450,7 +444,7 @@ class MyLocalPlanner(object):
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
         # target waypoint
-        
+        print(self._lane_delta)
         if len(self._waypoint_buffer) >= 5:
             if self._changing_lane:
                 self.changing_lane()
