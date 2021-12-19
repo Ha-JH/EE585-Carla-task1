@@ -455,7 +455,12 @@ class MyLocalPlanner(object):
                 print("CHANGING LANE")
             else:
                 self.keep_straight()
-                if self.check_front_obstacle():
+                if self._lane_delta > 0:
+                    if self.check_passed():
+                        self.return_lane()
+                        print("RETURNING LANE")
+
+                if not self._changing_lane and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
@@ -466,11 +471,6 @@ class MyLocalPlanner(object):
                         print("CHANGE LANE RIGHT")
                     else:
                         print("NO WHERE TO GO!")
-                else:
-                    if self._lane_delta > 0:
-                        if self.check_passed():
-                            self.return_lane()
-                            print("RETURNING LANE")
 
 
 
