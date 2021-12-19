@@ -310,6 +310,7 @@ class MyLocalPlanner(object):
         # target waypoint
         target_route_point = self._waypoint_buffer[0]
         target_waypoint = self.get_waypoint(target_route_point.position)
+        print("Distance to next waypoint:  ", math.sqrt((target_route_point.position.x-current_pose.position.x)**2 + (target_route_point.position.y-current_pose.position.y)**2 + (target_route_point.position.z-current_pose.position.z)**2))
         
         target_left, target_right = self.get_coordinate_lanemarking(target_waypoint.pose.position)
         target_left_waypoint = self.get_waypoint(target_left)
