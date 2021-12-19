@@ -203,20 +203,22 @@ class MyLocalPlanner(object):
         return ros_left_waypoint, ros_right_waypoint
 
     def get_adjacent_lane_points(self, position):
+        current_waypoint = self.get_waypoint(position)
+        lane_width = current_waypoint.lane_width
         left_lane, right_lane = self.get_coordinate_lanemarking(position)
-        left_dx = left_lane.x - position.x
-        left_dy = left_lane.y - position.y
+        left_disp = np.array([left_lane.x - position.x, left_lane.y - position.y])
+        left_disp = left_disp / np.linalg.norm(left_disp)
         left_point = Point()
-        left_point.x = position.x + 2.0 * left_dx
-        left_point.y = position.y + 2.0 * left_dy
+        left_point.x = position.x + lane_width * left_disp[0]
+        left_point.y = position.y + lane_width * left_disp[1]
         left_left, left_right = self.get_coordinate_lanemarking(left_point)
         left_midpoint = self.get_mid_waypoint(left_left, left_right)
 
-        right_dx = right_lane.x - position.x
-        right_dy = right_lane.y - position.y
+        right_disp = np.array([right_lane.x - position.x, right_lane.y - position.y])
+        right_disp = right_disp / np.linalg.norm(right_disp)
         right_point = Point()
-        right_point.x = position.x + 2.0 * right_dx
-        right_point.y = position.y + 2.0 * right_dy
+        right_point.x = position.x + lane_width * right_disp[0]
+        right_point.y = position.y + lane_width * right_disp[1]
         right_left, right_right = self.get_coordinate_lanemarking(right_point)
         right_midpoint = self.get_mid_waypoint(right_left, right_right)
 
