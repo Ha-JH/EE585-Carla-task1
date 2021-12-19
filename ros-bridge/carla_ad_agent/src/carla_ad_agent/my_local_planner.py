@@ -278,7 +278,7 @@ class MyLocalPlanner(object):
         buffer = []
         for i in range(3):
             buffer.append(self._waypoint_buffer.popleft())
-        target_point = buffer.top()
+        target_point = buffer[-1]
         target_waypoint = self.get_waypoint(target_point.position)
         collision = self.check_waypoint_obstacles(target_waypoint.pose.position)
         for i in range(3):
@@ -350,7 +350,7 @@ class MyLocalPlanner(object):
 
          
     def check_passed(self):
-        last_lane_change = self._lane_change_history.top()
+        last_lane_change = self._lane_change_history[-1]
         left, right = self.get_coordinate_lanemarking(self._current_waypoint.pose.position)
         if last_lane_change == -1:
             left_waypoint = self.get_waypoint(left)
@@ -362,7 +362,7 @@ class MyLocalPlanner(object):
         return passed and not result[(last_lane_change+1)/2]
 
     def return_lane(self):
-        last_lane_change = self._lane_change_history.top()
+        last_lane_change = self._lane_change_history[-1]
         if last_lane_change == -1:
             self.change_lane_left()
         else:
