@@ -154,15 +154,15 @@ class MyLocalPlanner(object):
                 and carla_location.y >= min(vy) and carla_location.y <= max(vy) \
                 and carla_location.z >= min(vz) and carla_location.z <= max(vz) 
 
-    def check_obstacles(self, position, obstacles):
-        for obstacle in obstacles:
+    def check_obstacles(self, position):
+        for obstacle in self._obstacles:
             if self.check_obstacle(position, obstacle):
                 return True
         return False 
 
     def check_waypoint_obstacles(self, position):
-        obstacles = self.get_obstacles(position, 70.0)
-        return self.check_obstacles(position, obstacles)
+        self.get_obstacles(position, 70.0)
+        return self.check_obstacles(position)
 
     def get_coordinate_lanemarking(self, position):
         """
