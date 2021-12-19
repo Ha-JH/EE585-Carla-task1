@@ -294,9 +294,9 @@ class MyLocalPlanner(object):
         self.get_obstacles(current_pose.position, 70.0)
 
         # Example 1: get two waypoints on the left and right lane marking w.r.t current pose
-        left, right = self.get_coordinate_lanemarking(current_pose.position)
-        print("\x1b[6;30;33m------Example 1------\x1b[0m")
-        print("Left: {}, {}; right: {}, {}".format(left.x, left.y, right.x, right.y))
+        # left, right = self.get_coordinate_lanemarking(current_pose.position)
+        # print("\x1b[6;30;33m------Example 1------\x1b[0m")
+        # print("Left: {}, {}; right: {}, {}".format(left.x, left.y, right.x, right.y))
         
         # # Example 2: check obstacle collision
         # print("\x1b[6;30;33m------Example 2------\x1b[0m")
