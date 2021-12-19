@@ -160,6 +160,10 @@ class MyLocalPlanner(object):
                 return True
         return False 
 
+    def check_waypoint_obstacles(self, position):
+        obstacles = self.get_obstacles(position, 70.0)
+        return self.check_obstacles(position, obstacles)
+
     def get_coordinate_lanemarking(self, position):
         """
         Helper to get adjacent waypoint 2D coordinates of the left and right lane markings 
@@ -304,8 +308,38 @@ class MyLocalPlanner(object):
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
         # target waypoint
-        self.target_route_point = self._waypoint_buffer[0]
+        target_route_point = self._waypoint_buffer[0]
+        
+        target_left, target_right = self.get_coordinate_lanemarking(target_route_point.position)
+        target_left_waypoint = self.get_waypoint(target_left)
+        target_right_waypoint = self.get_waypoint(target_right)
 
+        if self._current_waypoint.lane_id == target_route_point.lane_id:
+            if self.check_waypoint_obstacles(target_route_point):
+                if not self.check_waypoint_obstacles(target_left_waypoint.position):
+                    self._waypoint_buffer[0] = target_left_waypoint
+                elif not self.check_waypoint_obstacles(target_right_waypoint.position):
+                    self._waypoint_buffer[0] = target_right_waypoint
+                else:
+                    print("FUCK! NOWHERE TO GO!!!!")
+        
+        else:
+            if self.check_waypoint_obstacles(target_route_point):
+                if self._current_waypoint.lane_id == target_left_waypoint.lane_id:
+                    if not self.check_waypoint_obstacles(target_left_waypoint.position):
+                        self._waypoint_buffer[0] = target_left_waypoint
+                    else:
+                        print("FUCK! NOWHERE TO GO!!!!")
+                elif self._current_waypoint.lane_id == target_right_waypoint.lane_id:
+                    if not self.check_waypoint_obstacles(target_right_waypoint.position):
+                        self._waypoint_buffer[0] = target_right_waypoint
+                    else:
+                        print("FUCK! NOWHERE TO GO!!!!")
+                else:
+                    print("WTF???? WHERE AM I?!")
+
+
+        self.target_route_point = self._waypoint_buffer[0]
         target_point = PointStamped()
         target_point.header.frame_id = "map"
         target_point.point.x = self.target_route_point.position.x
