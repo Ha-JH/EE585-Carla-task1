@@ -80,6 +80,7 @@ class MyLocalPlanner(object):
         self._changing_lane = False
         self._lane_delta = 0
         self._lane_change_history = []
+        self._buffer_updated = False
 
         # get world and map for finding actors and waypoints
         client = carla.Client('localhost', 2000)
@@ -298,7 +299,7 @@ class MyLocalPlanner(object):
             left_waypoint = self.get_waypoint(left)
             right_waypoint = self.get_waypoint(right)
 
-            print("currernt lane: ", self._current_waypoint.pose.position)
+            print("currernt lane: ", waypoint.pose.position)
             print("left lane: ", left_waypoint.pose.position)
             print("right lane: ", right_waypoint.pose.position)
 
@@ -420,12 +421,15 @@ class MyLocalPlanner(object):
 
         #   Buffering the waypoints
         if len(self._waypoint_buffer) < 5:
+            self._buffer_updated = True
             for i in range(self._buffer_size - len(self._waypoint_buffer)):
                 if self._waypoints_queue:
                     self._waypoint_buffer.append(
                         self._waypoints_queue.popleft())
                 else:
                     break
+        else:
+            self._buffer_updated = False
 
         # current vehicle waypoint
         self._current_waypoint = self.get_waypoint(current_pose.position)
@@ -448,7 +452,7 @@ class MyLocalPlanner(object):
         #     print("id: {}, collision: {}".format(ob.id, self.check_obstacle(point, ob)))
         
         # target waypoint
-        if len(self._waypoint_buffer) >= 5:
+        if len(self._waypoint_buffer) >= 5 and self._buffer_updated:
             if self._changing_lane:
                 self.changing_lane()
                 print("CHANGING LANE")
