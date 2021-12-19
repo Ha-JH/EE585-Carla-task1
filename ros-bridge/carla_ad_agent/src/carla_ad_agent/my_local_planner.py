@@ -301,6 +301,8 @@ class MyLocalPlanner(object):
             result[1] = result[1] or self.check_waypoint_obstacles(right_waypoint.pose.position)
         for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
+
+        print(result)
         
         return result
 
@@ -360,7 +362,6 @@ class MyLocalPlanner(object):
             right_waypoint = self.get_waypoint(right)
             passed = not self.check_waypoint_obstacles(right_waypoint.pose.position)
         result = self.check_adjacent_lanes_obstacles()
-        print(result)
         return passed and not result[(last_lane_change+1)/2]
 
     def return_lane(self):
