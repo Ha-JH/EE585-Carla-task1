@@ -81,6 +81,7 @@ class MyLocalPlanner(object):
         self._lane_delta = 0
         self._lane_change_history = []
         self._buffer_updated = False
+        self._passing = False
 
         # get world and map for finding actors and waypoints
         client = carla.Client('localhost', 2000)
@@ -424,6 +425,16 @@ class MyLocalPlanner(object):
         self.keep_straight()
         self._changing_lane = False
 
+    def check_side(self):
+        last_lane_change = self._lane_change_history[-1]
+        left_point, right_point = self.get_adjacent_lane_points(self._current_waypoint.pose.position)
+        if last_lane_change == -1:
+            if self.check_waypoint_obstacles(left_point):
+                self._passing = False
+        else:
+            if self.check_waypoint_obstacles(right_point):
+                self._passing = False
+
 
     def run_step(self, target_speed, current_speed, current_pose):
         """
@@ -480,7 +491,10 @@ class MyLocalPlanner(object):
                 print("CHANGING LANE")
             else:
                 self.keep_straight()
-                if self._lane_delta != 0:
+                if self._passing:
+                    self.side()
+
+                if self._lane_delta != 0 and not self._passing:
                     if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
@@ -490,10 +504,12 @@ class MyLocalPlanner(object):
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
                         self.change_lane_left()
+                        self._passing = True
                         print("CHANGE LANE LEFT")
                     elif not result[1]:
                         self.change_lane_right()
                         print("CHANGE LANE RIGHT")
+                        self._passing = True
                     else:
                         print("NO WHERE TO GO!")
 
