@@ -264,9 +264,9 @@ class MyLocalPlanner(object):
 
     def get_mid_waypoint(self, pose1, pose2):
         midpoint = Pose()
-        midpoint.position.x = (pose1.x + pose2.x) / 2.0
-        midpoint.position.y = (pose1.y + pose2.y) / 2.0
-        midpoint.position.z = (pose1.z + pose2.z) / 2.0
+        midpoint.position.x = (pose1.position.x + pose2.position.x) / 2.0
+        midpoint.position.y = (pose1.position.y + pose2.position.y) / 2.0
+        midpoint.position.z = (pose1.position.z + pose2.position.z) / 2.0
 
         return midpoint
 
