@@ -154,7 +154,7 @@ class MyLocalPlanner(object):
                 and carla_location.y >= min(vy) and carla_location.y <= max(vy) \
                 and carla_location.z >= min(vz) and carla_location.z <= max(vz) 
 
-    def check_obstacle(self, position, obstacles):
+    def check_obstacles(self, position, obstacles):
         for obstacle in obstacles:
             if self.check_obstacle(position, obstacle):
                 return True
