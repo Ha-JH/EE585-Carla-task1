@@ -457,7 +457,7 @@ class MyLocalPlanner(object):
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
                         self.change_lane_left()
-                    elif not result[0]:
+                    elif not result[1]:
                         self.change_lane_right()
                     else:
                         print("NO WHERE TO GO!")
