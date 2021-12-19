@@ -309,30 +309,31 @@ class MyLocalPlanner(object):
         
         # target waypoint
         target_route_point = self._waypoint_buffer[0]
+        target_waypoint = self.get_waypoint(target_route_point.position)
         
-        target_left, target_right = self.get_coordinate_lanemarking(target_route_point.position)
+        target_left, target_right = self.get_coordinate_lanemarking(target_waypoint.pose.position)
         target_left_waypoint = self.get_waypoint(target_left)
         target_right_waypoint = self.get_waypoint(target_right)
 
-        if self._current_waypoint.lane_id == target_route_point.lane_id:
-            if self.check_waypoint_obstacles(target_route_point):
-                if not self.check_waypoint_obstacles(target_left_waypoint.position):
-                    self._waypoint_buffer[0] = target_left_waypoint
-                elif not self.check_waypoint_obstacles(target_right_waypoint.position):
-                    self._waypoint_buffer[0] = target_right_waypoint
+        if self._current_waypoint.lane_id == target_waypoint.lane_id:
+            if self.check_waypoint_obstacles(target_waypoint.pose.position):
+                if not self.check_waypoint_obstacles(target_left_waypoint.pose.position):
+                    self._waypoint_buffer[0] = target_left_waypoint.pose
+                elif not self.check_waypoint_obstacles(target_right_waypoint.pose.position):
+                    self._waypoint_buffer[0] = target_right_waypoint.pose
                 else:
                     print("FUCK! NOWHERE TO GO!!!!")
         
         else:
-            if self.check_waypoint_obstacles(target_route_point):
+            if self.check_waypoint_obstacles(target_waypoint.pose.position):
                 if self._current_waypoint.lane_id == target_left_waypoint.lane_id:
-                    if not self.check_waypoint_obstacles(target_left_waypoint.position):
-                        self._waypoint_buffer[0] = target_left_waypoint
+                    if not self.check_waypoint_obstacles(target_left_waypoint.pose.position):
+                        self._waypoint_buffer[0] = target_left_waypoint.pose
                     else:
                         print("FUCK! NOWHERE TO GO!!!!")
                 elif self._current_waypoint.lane_id == target_right_waypoint.lane_id:
-                    if not self.check_waypoint_obstacles(target_right_waypoint.position):
-                        self._waypoint_buffer[0] = target_right_waypoint
+                    if not self.check_waypoint_obstacles(target_right_waypoint.pose.position):
+                        self._waypoint_buffer[0] = target_right_waypoint.pose
                     else:
                         print("FUCK! NOWHERE TO GO!!!!")
                 else:

@@ -201,8 +201,9 @@ class Evaluator():
                 if time_elapsed >= 60 * 5.0:
                     print("Time is up")
                     self.output_result()
-                else:
+                # else:
                     # print("Timer: {} sec".format(time_elapsed))
+
 
                 # Progress evaluation
                 if self._route_assigned:
