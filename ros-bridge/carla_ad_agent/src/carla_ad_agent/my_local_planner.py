@@ -359,7 +359,7 @@ class MyLocalPlanner(object):
         else:
             right_waypoint = self.get_waypoint(right)
             passed = not self.check_waypoint_obstacles(right_waypoint.pose.position)
-        result = self.check_adjacent_lanes()
+        result = self.check_adjacent_lanes_obstacles()
         return passed and not result[(last_lane_change+1)/2]
 
     def return_lane(self):
