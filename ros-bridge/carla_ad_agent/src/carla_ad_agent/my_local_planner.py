@@ -451,20 +451,25 @@ class MyLocalPlanner(object):
         if len(self._waypoint_buffer) >= 5:
             if self._changing_lane:
                 self.changing_lane()
+                print("CHANGING LANE")
             else:
                 self.keep_straight()
                 if self.check_front_obstacle():
+                    print("OBSTACLE DECTECTED FRONT")
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
                         self.change_lane_left()
+                        print("CHANGE LANE LEFT")
                     elif not result[1]:
                         self.change_lane_right()
+                        print("CHANGE LANE RIGHT")
                     else:
                         print("NO WHERE TO GO!")
                 else:
                     if self._lane_delta > 0:
                         if self.check_passed():
                             self.return_lane()
+                            print("RETURNING LANE")
 
 
 
