@@ -553,26 +553,8 @@ class MyLocalPlanner(object):
                         target_speed = 10
                 
                 elif current_speed < 5.0:
-                    result = self.check_adjacent_lanes_obstacles()
-                    if not result[0]:
-                        self.change_lane_left()
-                        self._passing = True
-                        # print("CHANGE LANE LEFT")
-                    elif not result[1]:
-                        self.change_lane_right()
-                        # print("CHANGE LANE RIGHT")
-                        self._passing = True
-                    else:
-                        # print("NO WHERE TO GO!")
-                        target_speed = 10
-
-
-
-
-
-
-    
-
+                    self.change_lane_left()
+                    self._passing = True
 
         self.target_route_point = self._waypoint_buffer[0]
         target_point = PointStamped()
