@@ -185,7 +185,9 @@ class MyLocalPlanner(object):
         # if current_waypoint.is_junction:
         #     return None, None
         waypoint_xodr = self.map.get_waypoint_xodr(current_waypoint.road_id, current_waypoint.lane_id, current_waypoint.s)
-        
+        if waypoint_xodr is None:
+            return None, None
+
         # find two orthonormal vectors to the direction of the lane
         yaw = math.pi - waypoint_xodr.transform.rotation.yaw * math.pi / 180.0
         v = np.array([1.0, math.tan(yaw)])
