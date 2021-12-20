@@ -461,10 +461,12 @@ class MyLocalPlanner(object):
             return
         if last_lane_change == -1:
             if self.check_waypoint_obstacles(left_point):
+                print("PASSED LEFT"))
                 self._passing = False
         else:
             if self.check_waypoint_obstacles(right_point):
                 self._passing = False
+                print("PASSED RIGHT")
 
 
     def run_step(self, target_speed, current_speed, current_pose):
