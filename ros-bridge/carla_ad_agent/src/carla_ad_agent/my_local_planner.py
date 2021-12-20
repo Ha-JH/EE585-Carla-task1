@@ -182,8 +182,8 @@ class MyLocalPlanner(object):
         """
         # get waypoints along road
         current_waypoint = self.get_waypoint(position)
-        if current_waypoint.is_junction:
-            return None, None
+        # if current_waypoint.is_junction:
+        #     return None, None
         waypoint_xodr = self.map.get_waypoint_xodr(current_waypoint.road_id, current_waypoint.lane_id, current_waypoint.s)
         
         # find two orthonormal vectors to the direction of the lane
@@ -343,7 +343,6 @@ class MyLocalPlanner(object):
 
             result[0] = result[0] or self.check_waypoint_obstacles(left_waypoint.pose.position)
             result[1] = result[1] or self.check_waypoint_obstacles(right_waypoint.pose.position)
-            print(result)
         for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
         
