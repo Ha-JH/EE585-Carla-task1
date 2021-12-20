@@ -16,6 +16,7 @@ import rospy
 import math
 import numpy as np
 from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from tf.transformations import euler_from_quaternion
@@ -96,8 +97,15 @@ class MyLocalPlanner(object):
         self._get_waypoint_client = rospy.ServiceProxy(
             '/carla_waypoint_publisher/{}/get_waypoint'.format(role_name), GetWaypoint)
 
+        self.goal_subscriber = rospy.Subscriber(
+            "/carla/{}/goal".format(role_name), PoseStamped, self.add_goal)
+
         # initializing controller
         self._init_controller(opt_dict)
+
+    def add_goal(self, goal):
+        self._waypoints_queue.append(goal.pose.position)
+
 
     def get_obstacles(self, location, range):
         """
