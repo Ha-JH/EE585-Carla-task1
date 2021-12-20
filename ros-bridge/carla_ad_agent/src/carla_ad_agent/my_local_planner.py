@@ -302,10 +302,15 @@ class MyLocalPlanner(object):
         buffer = []
         collision = False
         for i in range(5):
-            buffer.append(self._waypoint_buffer.popleft())
-        target_point = buffer[-1]
-        target_waypoint = self.get_waypoint(target_point.position)
-        collision = collision or self.check_waypoint_obstacles(target_waypoint.pose.position)
+            pose = self._waypoint_buffer.popleft()
+            buffer.append(pose)
+            left_lane_point, right_lane_point = self.get_coordinate_lanemarking(pose.position)
+            left_lane_waypoint = self.get_waypoint(left_lane_point)
+            right_lane_waypoint = self.get_waypoint(right_lane_point)
+            waypoint = self.get_waypoint(pose.position)
+            collision = collision or self.check_waypoint_obstacles(waypoint.pose.position)
+            collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
+            collision = collision or self.check_waypoint_obstacles(right_lane_waypoint.pose.position)
         for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
 
@@ -512,6 +517,7 @@ class MyLocalPlanner(object):
                         self._passing = True
                     else:
                         print("NO WHERE TO GO!")
+                        target_speed = 0
 
 
 
