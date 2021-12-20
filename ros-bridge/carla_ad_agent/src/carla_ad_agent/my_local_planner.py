@@ -551,6 +551,21 @@ class MyLocalPlanner(object):
                     else:
                         print("NO WHERE TO GO!")
                         target_speed = 10
+                
+                elif current_speed < 5.0:
+                    result = self.check_adjacent_lanes_obstacles()
+                    if not result[0] and "Solid" not in str(self._current_waypoint.left_lane_marking):
+                        self.change_lane_left()
+                        self._passing = True
+                        print("CHANGE LANE LEFT")
+                    elif not result[1]and "Solid" not in str(self._current_waypoint.right_lane_marking):
+                        self.change_lane_right()
+                        print("CHANGE LANE RIGHT")
+                        self._passing = True
+                    else:
+                        print("NO WHERE TO GO!")
+                        target_speed = 10
+
 
 
 
