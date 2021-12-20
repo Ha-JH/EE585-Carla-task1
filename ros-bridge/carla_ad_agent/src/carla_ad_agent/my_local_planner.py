@@ -521,12 +521,12 @@ class MyLocalPlanner(object):
                 if self._passing:
                     self.check_side()
 
-                if self._lane_delta != 0 and not self._passing:
+                elif self._lane_delta != 0 and not self._passing:
                     if self.can_return():
                         self.return_lane()
                         print("RETURNING LANE")
 
-                if not self._changing_lane and self.check_front_obstacle():
+                elif not self._changing_lane and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
