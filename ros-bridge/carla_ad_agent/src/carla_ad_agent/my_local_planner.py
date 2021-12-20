@@ -517,7 +517,7 @@ class MyLocalPlanner(object):
                         self._passing = True
                     else:
                         print("NO WHERE TO GO!")
-                        target_speed = 1
+                        target_speed = 10
 
 
 
