@@ -539,13 +539,12 @@ class MyLocalPlanner(object):
 
                 elif not self._changing_lane and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
-                    print(self._current_waypoint.left_lane_marking, self._current_waypoint.right_lane_marking)
                     result = self.check_adjacent_lanes_obstacles()
-                    if not result[0] and "Solid" not in self._current_waypoint.left_lane_marking:
+                    if not result[0] and "Solid" not in str(self._current_waypoint.left_lane_marking):
                         self.change_lane_left()
                         self._passing = True
                         print("CHANGE LANE LEFT")
-                    elif not result[1]and "Solid" not in self._current_waypoint.right_lane_marking:
+                    elif not result[1]and "Solid" not in str(self._current_waypoint.right_lane_marking):
                         self.change_lane_right()
                         print("CHANGE LANE RIGHT")
                         self._passing = True
