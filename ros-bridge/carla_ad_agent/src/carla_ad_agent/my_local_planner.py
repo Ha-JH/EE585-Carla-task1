@@ -540,7 +540,7 @@ class MyLocalPlanner(object):
                 elif not self._changing_lane and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
                     result = self.check_adjacent_lanes_obstacles()
-                    if not result[0] :
+                    if not result[0]:
                         self.change_lane_left()
                         self._passing = True
                         print("CHANGE LANE LEFT")
@@ -558,7 +558,7 @@ class MyLocalPlanner(object):
                         self.change_lane_left()
                         self._passing = True
                         print("CHANGE LANE LEFT")
-                    elif not result[1]and "Solid":
+                    elif not result[1]:
                         self.change_lane_right()
                         print("CHANGE LANE RIGHT")
                         self._passing = True
