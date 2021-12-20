@@ -217,6 +217,8 @@ class MyLocalPlanner(object):
         left_point.x = position.x + lane_width * left_disp[0]
         left_point.y = position.y + lane_width * left_disp[1]
         left_left, left_right = self.get_coordinate_lanemarking(left_point)
+        if left_left is None or left_right is None:
+            return None, None
         left_midpoint = self.get_mid_waypoint(left_left, left_right)
 
         right_disp = np.array([right_lane.x - position.x, right_lane.y - position.y])
@@ -225,6 +227,8 @@ class MyLocalPlanner(object):
         right_point.x = position.x + lane_width * right_disp[0]
         right_point.y = position.y + lane_width * right_disp[1]
         right_left, right_right = self.get_coordinate_lanemarking(right_point)
+        if right_left is None or right_right is None:
+            return None, None
         right_midpoint = self.get_mid_waypoint(right_left, right_right)
 
         return left_midpoint, right_midpoint
