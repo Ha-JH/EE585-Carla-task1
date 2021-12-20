@@ -321,6 +321,8 @@ class MyLocalPlanner(object):
                 continue    
             left_midpoint = self.get_mid_waypoint(left_lane_point, pose.position)
             right_midpoint = self.get_mid_waypoint(right_lane_point, pose.position)
+            left_midpoint = self.get_mid_waypoint(left_midpoint, left_lane_point)
+            right_midpoint = self.get_mid_waypoint(right_midpoint, right_lane_point)
             left_lane_waypoint = self.get_waypoint(left_midpoint)
             right_lane_waypoint = self.get_waypoint(right_midpoint)
             collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
@@ -535,6 +537,7 @@ class MyLocalPlanner(object):
 
                 elif not self._changing_lane and self.check_front_obstacle():
                     print("OBSTACLE DECTECTED FRONT")
+                    print(self._current_waypoint.left_lane_marking, self._current_waypoint.right_lane_marking)
                     result = self.check_adjacent_lanes_obstacles()
                     if not result[0]:
                         self.change_lane_left()
