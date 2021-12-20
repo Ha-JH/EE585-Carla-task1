@@ -313,8 +313,10 @@ class MyLocalPlanner(object):
             collision = collision or self.check_waypoint_obstacles(waypoint.pose.position)
             if left_lane_point is None or right_lane_point is None:
                 continue    
-            left_lane_waypoint = self.get_waypoint(left_lane_point)
-            right_lane_waypoint = self.get_waypoint(right_lane_point)
+            left_midpoint = self.get_mid_waypoint(left_lane_point, pose.point)
+            right_midpoint = self.get_mid_waypoint(right_lane_point, pose.point)
+            left_lane_waypoint = self.get_waypoint(left_midpoint)
+            right_lane_waypoint = self.get_waypoint(right_midpoint)
             collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
             collision = collision or self.check_waypoint_obstacles(right_lane_waypoint.pose.position)
         for i in range(5):
@@ -537,6 +539,7 @@ class MyLocalPlanner(object):
                         self._passing = True
                     else:
                         print("NO WHERE TO GO!")
+                        target_speed = 10
 
 
 
