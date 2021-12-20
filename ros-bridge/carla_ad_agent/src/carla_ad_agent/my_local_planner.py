@@ -309,8 +309,8 @@ class MyLocalPlanner(object):
             right_lane_waypoint = self.get_waypoint(right_lane_point)
             waypoint = self.get_waypoint(pose.position)
             collision = collision or self.check_waypoint_obstacles(waypoint.pose.position)
-            collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
-            collision = collision or self.check_waypoint_obstacles(right_lane_waypoint.pose.position)
+            # collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
+            # collision = collision or self.check_waypoint_obstacles(right_lane_waypoint.pose.position)
         for i in range(5):
             self._waypoint_buffer.appendleft(buffer.pop())
 
@@ -326,10 +326,6 @@ class MyLocalPlanner(object):
             left_point, right_point = self.get_adjacent_lane_points(waypoint.pose.position)
             left_waypoint = self.get_waypoint(left_point)
             right_waypoint = self.get_waypoint(right_point)
-
-            print("currernt lane: ", waypoint.pose.position)
-            print("left lane: ", left_waypoint.pose.position)
-            print("right lane: ", right_waypoint.pose.position)
 
             result[0] = result[0] or self.check_waypoint_obstacles(left_waypoint.pose.position)
             result[1] = result[1] or self.check_waypoint_obstacles(right_waypoint.pose.position)
@@ -406,6 +402,8 @@ class MyLocalPlanner(object):
 
         self._lane_change_history.pop()
         self._lane_change_history.pop()
+
+        self._passing = False
         
 
     def keep_straight(self):
@@ -517,7 +515,6 @@ class MyLocalPlanner(object):
                         self._passing = True
                     else:
                         print("NO WHERE TO GO!")
-                        target_speed = 10
 
 
 
