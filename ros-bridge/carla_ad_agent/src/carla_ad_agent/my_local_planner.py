@@ -313,8 +313,8 @@ class MyLocalPlanner(object):
             collision = collision or self.check_waypoint_obstacles(waypoint.pose.position)
             if left_lane_point is None or right_lane_point is None:
                 continue    
-            left_midpoint = self.get_mid_waypoint(left_lane_point, pose.point)
-            right_midpoint = self.get_mid_waypoint(right_lane_point, pose.point)
+            left_midpoint = self.get_mid_waypoint(left_lane_point, pose.position)
+            right_midpoint = self.get_mid_waypoint(right_lane_point, pose.position)
             left_lane_waypoint = self.get_waypoint(left_midpoint)
             right_lane_waypoint = self.get_waypoint(right_midpoint)
             collision = collision or self.check_waypoint_obstacles(left_lane_waypoint.pose.position)
